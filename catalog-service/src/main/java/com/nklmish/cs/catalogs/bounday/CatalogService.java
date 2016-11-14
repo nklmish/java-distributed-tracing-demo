@@ -29,16 +29,23 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @Slf4j
-public class CatalogService {
+public class CatalogService implements ApplicationListener<ContextClosedEvent>{
 
     private final RestTemplate restTemplate;
+
+    private final CommunicationService communicationService;
+
+    private final TraceableExecutorService executorService;
 
     private final Tracer tracer;
 
     @Autowired
     public CatalogService(RestTemplate restTemplate,
-                          Tracer tracer) {
+                          CommunicationService communicationService,
+                          TraceableExecutorService executorService, Tracer tracer) {
         this.restTemplate = restTemplate;
+        this.communicationService = communicationService;
+        this.executorService = executorService;
         this.tracer = tracer;
     }
 
@@ -50,6 +57,12 @@ public class CatalogService {
         tracer.getCurrentSpan().logEvent("products.fetch");
         List<Product> products = getProducts(id);
 
+        tracer.getCurrentSpan().logEvent("email.send");
+        communicationService.executeInBackground();
+
+        simulatePause();
+
+        executorService.execute(new Processor());
         return new Catalog(id, price, products);
     }
 
@@ -97,5 +110,53 @@ public class CatalogService {
                                 id
                         )
         );
+    }
+
+    private void simulatePause() throws InterruptedException {
+        //random sleep
+        if (Math.random() > 0.5) {
+            //report full GC
+            TimeUnit.SECONDS.sleep(3);
+            tracer.getCurrentSpan().logEvent("gc.full");
+        }
+    }
+
+    @Override
+    public void onApplicationEvent(ContextClosedEvent contextClosedEvent) {
+        executorService.shutdown();
+    }
+}
+
+@Component
+@Slf4j
+class CommunicationService {
+    private final Tracer tracer;
+
+    @Autowired
+    CommunicationService(Tracer tracer) {
+        this.tracer = tracer;
+    }
+
+    @Async
+    void executeInBackground() throws InterruptedException {
+        log.info("sending email...");
+        TimeUnit.SECONDS.sleep(1);
+        tracer.addTag("cluster", "phoenix");
+        log.info("Email sent");
+    }
+}
+
+@SpanName("catalog-processor")
+@Slf4j
+class Processor implements Runnable {
+
+    public void run() {
+        log.info("Processing ...");
+        try {
+            TimeUnit.MILLISECONDS.sleep(100);
+        } catch (InterruptedException e) {
+            log.error("sleep interrupted", e);
+        }
+        log.info("Processed");
     }
 }
