@@ -13,7 +13,7 @@ The catalog service communicates with:
 ## Dependencies
 - JDK-8
 - [Docker] (https://docs.docker.com/engine/installation/)
-- [Go-distributed-tracing-demo] (https://github.com/nklmish/go-distributed-tracing-demo) - see
+- [Go-distributed-tracing-demo] (https://github.com/nklmish/go-distributed-tracing-demo) - clone and run it locally
 - [Open-zipkin] (https://github.com/openzipkin/docker-zipkin) - you can run it by executing
 ```
 docker run -d -p 9411:9411 openzipkin/zipkin
