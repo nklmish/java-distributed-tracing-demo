@@ -1,0 +1,11 @@
+server:
+  port: 8070
+
+spring:
+  application:
+    name: java-price-service
+  sleuth:
+    sampler:
+      percentage: 1.0
+  zipkin:
+     baseUrl: http://localhost:9411/

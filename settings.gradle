@@ -1,0 +1,4 @@
+rootProject.name = 'distributed-tracing-demo'
+include 'catalog-service'
+include 'price-service'
+

@@ -1,0 +1,11 @@
+server:
+  port: 8060
+
+spring:
+  application:
+    name: java-catalog-service
+  sleuth:
+    sampler:
+      percentage: 1.0
+  zipkin:
+     baseUrl: http://localhost:9411/
