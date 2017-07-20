@@ -3,12 +3,13 @@ version '1.0-SNAPSHOT'
 
 buildscript {
     ext {
-        springBootVersion = '1.4.1.RELEASE'
-        springCloudVersion = 'Camden.RELEASE'
+        springBootVersion = '1.5.4.RELEASE'
+        springCloudVersion = 'Camden.SR7'
         lombokVersion = '1.16.10'
     }
     repositories {
         mavenLocal()
+        maven {url "https://repo.spring.io/milestone"}
         mavenCentral()
         jcenter()
     }
@@ -36,6 +37,9 @@ subprojects {
     repositories {
         mavenLocal()
         mavenCentral()
+        maven {
+            url "https://repo.spring.io/milestone"
+        }
         jcenter()
     }
 
